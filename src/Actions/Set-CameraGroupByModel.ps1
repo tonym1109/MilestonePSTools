@@ -27,10 +27,16 @@ function Set-CameraGroupByModel {
     & $Log "$($cameras.Count) cameras trouvees."
 
     # Creer ou recuperer le dossier parent
-    $parentFolder = Get-VmsDeviceGroup -Name $parentFolderName -ErrorAction SilentlyContinue
+    $parentFolder = Get-VmsDeviceGroup | Where-Object { $_.Name -eq $parentFolderName } | Select-Object -First 1
     if (-not $parentFolder) {
-        $parentFolder = New-VmsDeviceGroup -Name $parentFolderName
-        & $Log "Dossier parent '$parentFolderName' cree."
+        try {
+            $parentFolder = New-VmsDeviceGroup -Name $parentFolderName
+            & $Log "Dossier parent '$parentFolderName' cree."
+        } catch {
+            $parentFolder = Get-VmsDeviceGroup | Where-Object { $_.Name -eq $parentFolderName } | Select-Object -First 1
+            if (-not $parentFolder) { throw }
+            & $Log "Dossier parent '$parentFolderName' recupere (existait deja)."
+        }
     }
 
     # Grouper par modele
@@ -44,9 +50,14 @@ function Set-CameraGroupByModel {
         }
 
         # Creer ou recuperer le sous-dossier du modele
-        $deviceGroup = Get-VmsDeviceGroup -ParentGroup $parentFolder -Name $model -ErrorAction SilentlyContinue
+        $deviceGroup = Get-VmsDeviceGroup -ParentGroup $parentFolder | Where-Object { $_.Name -eq $model } | Select-Object -First 1
         if (-not $deviceGroup) {
-            $deviceGroup = New-VmsDeviceGroup -ParentGroup $parentFolder -Name $model
+            try {
+                $deviceGroup = New-VmsDeviceGroup -ParentGroup $parentFolder -Name $model
+            } catch {
+                $deviceGroup = Get-VmsDeviceGroup -ParentGroup $parentFolder | Where-Object { $_.Name -eq $model } | Select-Object -First 1
+                if (-not $deviceGroup) { throw }
+            }
         }
 
         foreach ($camera in $group.Group) {
