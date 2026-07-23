@@ -1,20 +1,11 @@
-<#
-.SYNOPSIS
-    Capture un snapshot de toutes les cameras du VMS Milestone.
-.PARAMETER Config
-    Hashtable de configuration (outputDirectory, snapshotQuality).
-.PARAMETER Log
-    Scriptblock callback pour logger vers l'UI.
-#>
-
 function Get-SnapshotAll {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
-        [hashtable]$Config,
-
-        [Parameter(Mandatory)]
-        [scriptblock]$Log
+        [Parameter(Mandatory)] [hashtable]$Config,
+        [Parameter(Mandatory)] [scriptblock]$Log,
+        [Parameter()] [scriptblock]$Cancel = { $false },
+        [Parameter()] [scriptblock]$ReportProgress = {},
+        [Parameter()] [nullable[datetime]]$SnapshotTime = $null
     )
 
     $snapshotDir = Join-Path $Config.outputDirectory 'Snapshots'
@@ -22,27 +13,43 @@ function Get-SnapshotAll {
         New-Item -Path $snapshotDir -ItemType Directory -Force | Out-Null
     }
 
-    & $Log "Recuperation de la liste des cameras..."
-    $cameras = Get-VmsCamera
-    & $Log "$($cameras.Count) cameras trouvees. Capture en cours..."
+    & $Log $script:T.SA_LogCams
+    $cameras = @(Get-VmsCamera)
+    $total   = $cameras.Count
+    & $Log ($script:T.SA_LogFound -f $total)
 
-    $count = 0
-    foreach ($cam in $cameras) {
-        $count++
-        & $Log "[$count/$($cameras.Count)] Snapshot de '$($cam.Name)'..."
+    if ($SnapshotTime) { & $Log ($script:T.SA_LogHistorique -f $SnapshotTime.ToString('dd/MM/yyyy HH:mm')) }
+
+    $behavior = if ($SnapshotTime) { 'GetNearest' } else { 'GetEnd' }
+    $quality  = $Config.snapshotQuality
+
+    $received = 0
+    $errors   = 0
+
+    for ($i = 0; $i -lt $cameras.Count; $i++) {
+        $cam = $cameras[$i]
+
+        if (& $Cancel) { & $Log $script:T.SA_LogCancelled ; break }
 
         try {
-            $cam | Get-Snapshot `
-                -UseFriendlyName `
-                -Behavior GetEnd `
-                -Quality $Config.snapshotQuality `
-                -Save `
-                -Path $snapshotDir
+            if ($SnapshotTime) {
+                $cam | Get-Snapshot -UseFriendlyName -Behavior $behavior `
+                    -Time $SnapshotTime -Quality $quality -Save -Path $snapshotDir
+            } else {
+                $cam | Get-Snapshot -UseFriendlyName -Behavior $behavior `
+                    -Quality $quality -Save -Path $snapshotDir
+            }
+            $received++
+            & $Log ($script:T.SA_LogOk -f $received, $total, $cam.Name)
+        } catch {
+            $errors++
+            & $Log ($script:T.SA_LogError -f $cam.Name, $_)
         }
-        catch {
-            & $Log "ERREUR sur '$($cam.Name)': $_"
-        }
+
+        & $ReportProgress ($i + 1) $total
     }
 
-    & $Log "Terminee. $count snapshots traites dans : $snapshotDir"
+    $msg = if ($errors -gt 0) { $script:T.SA_LogDoneErr -f $received, $errors, $snapshotDir }
+           else                { $script:T.SA_LogDone    -f $received, $snapshotDir }
+    & $Log $msg
 }
