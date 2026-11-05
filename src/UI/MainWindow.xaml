@@ -8,7 +8,6 @@
 
     <Window.Resources>
 
-        <!-- Style des boutons d'action dans la sidebar -->
         <Style x:Key="ActionButton" TargetType="Button">
             <Setter Property="Background" Value="#313244"/>
             <Setter Property="Foreground" Value="#CDD6F4"/>
@@ -46,7 +45,6 @@
             </Setter>
         </Style>
 
-        <!-- Style du bouton Effacer le log -->
         <Style x:Key="ClearButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#6C7086"/>
@@ -70,6 +68,154 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#313244"/>
+                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CancelButton" TargetType="Button">
+            <Setter Property="Background" Value="#F38BA8"/>
+            <Setter Property="Foreground" Value="#1E1E2E"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="12,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#EBA0B5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#D97090"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DarkComboBox" TargetType="ComboBox">
+            <Setter Property="Foreground"   Value="#CDD6F4"/>
+            <Setter Property="Background"   Value="#313244"/>
+            <Setter Property="BorderBrush"  Value="#45475A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding"      Value="8,6"/>
+            <Setter Property="FontFamily"   Value="Segoe UI"/>
+            <Setter Property="FontSize"     Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="toggleButton"
+                                          Grid.ColumnSpan="2"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay,
+                                                      RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="bd"
+                                                Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                BorderBrush="{Binding BorderBrush, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                BorderThickness="1"
+                                                CornerRadius="6">
+                                            <TextBlock Text="▾" Foreground="#6C7086" FontSize="10"
+                                                       HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,10,0"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background"  Value="#45475A"/>
+                                                <Setter TargetName="bd" Property="BorderBrush" Value="#6C7086"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="#45475A"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              IsHitTestVisible="False"/>
+                            <Popup x:Name="PART_Popup"
+                                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True">
+                                <Border Background="#2A2A3E"
+                                        BorderBrush="#45475A"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Margin="0,2,0,0">
+                                    <ItemsPresenter/>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Resources>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Foreground" Value="#CDD6F4"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Padding"    Value="10,8"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ComboBoxItem">
+                                <Border x:Name="bd"
+                                        Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="#45475A"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="#585B70"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <Style x:Key="SmallButton" TargetType="Button">
+            <Setter Property="Background" Value="#313244"/>
+            <Setter Property="Foreground" Value="#A6ADC8"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#45475A"/>
                                 <Setter Property="Foreground" Value="#CDD6F4"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -113,19 +259,96 @@
                 <!-- Separateur -->
                 <Border DockPanel.Dock="Top" Height="1" Background="#313244" Margin="16,0"/>
 
-                <!-- Pied de page -->
+                <!-- Pied de page avec dossier de sortie -->
                 <Border DockPanel.Dock="Bottom" Padding="16,12">
-                    <TextBlock Text="v2.0"
-                               FontFamily="Segoe UI" FontSize="11"
-                               Foreground="#585B70" HorizontalAlignment="Center"/>
+                    <StackPanel>
+                        <TextBlock x:Name="LblOutputDirHeader" Text="DOSSIER DE SORTIE"
+                                   FontFamily="Segoe UI" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#585B70" Margin="0,0,0,6"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="OutputDirText"
+                                       Grid.Column="0"
+                                       Text="./Output"
+                                       FontFamily="Segoe UI" FontSize="10"
+                                       Foreground="#6C7086"
+                                       TextTrimming="CharacterEllipsis"
+                                       VerticalAlignment="Center"/>
+                            <Button x:Name="BtnOutputDir"
+                                    Grid.Column="1"
+                                    Content="Changer"
+                                    Style="{StaticResource SmallButton}"
+                                    Margin="8,0,0,0"/>
+                        </Grid>
+                        <TextBlock x:Name="LblVersion" Text="v4.4  Fork by Vincent"
+                                   FontFamily="Segoe UI" FontSize="10"
+                                   Foreground="#45475A"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,10,0,0"/>
+                    </StackPanel>
                 </Border>
 
                 <!-- Boutons d'action -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
                     <StackPanel>
 
+                        <!-- Categorie : Mode capture -->
+                        <TextBlock x:Name="LblModeCapture" Text="MODE CAPTURE"
+                                   FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#CBA6F7" Margin="20,12,0,4"/>
+
+                        <ComboBox x:Name="SnapshotMode"
+                                  Margin="8,2,8,0"
+                                  Style="{StaticResource DarkComboBox}">
+                            <ComboBoxItem Content="Live (derniere image)" IsSelected="True"/>
+                            <ComboBoxItem Content="Image historique"/>
+                        </ComboBox>
+
+                        <!-- Panneau date / heure (affiche uniquement en mode historique) -->
+                        <Border x:Name="DateTimePanel"
+                                Margin="8,6,8,4"
+                                Background="#1E1E2E"
+                                CornerRadius="6"
+                                Padding="12,10"
+                                Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock x:Name="LblDate" Text="Date"
+                                           FontFamily="Segoe UI" FontSize="10"
+                                           Foreground="#585B70" Margin="0,0,0,4"/>
+                                <DatePicker x:Name="SnapshotDate"
+                                            FontFamily="Segoe UI" FontSize="12"
+                                            Background="#313244"
+                                            Foreground="#1E1E2E"
+                                            BorderBrush="#45475A"/>
+                                <TextBlock x:Name="LblHeure" Text="Heure (HH : mm)"
+                                           FontFamily="Segoe UI" FontSize="10"
+                                           Foreground="#585B70" Margin="0,10,0,4"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox x:Name="SnapshotHour"
+                                             Text="14" Width="46"
+                                             Background="#313244" Foreground="#CDD6F4"
+                                             BorderBrush="#45475A" BorderThickness="1"
+                                             FontFamily="Segoe UI" FontSize="14"
+                                             TextAlignment="Center" Padding="4,5"/>
+                                    <TextBlock Text=" : "
+                                               VerticalAlignment="Center"
+                                               Foreground="#6C7086" FontSize="18"
+                                               Margin="2,0"/>
+                                    <TextBox x:Name="SnapshotMinute"
+                                             Text="59" Width="46"
+                                             Background="#313244" Foreground="#CDD6F4"
+                                             BorderBrush="#45475A" BorderThickness="1"
+                                             FontFamily="Segoe UI" FontSize="14"
+                                             TextAlignment="Center" Padding="4,5"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Categorie : Snapshots -->
-                        <TextBlock Text="SNAPSHOTS"
+                        <TextBlock x:Name="LblSnapshots" Text="SNAPSHOTS"
                                    FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
                                    Foreground="#89B4FA" Margin="20,12,0,4"/>
 
@@ -154,7 +377,7 @@
                         </Button>
 
                         <!-- Categorie : Gestion -->
-                        <TextBlock Text="GESTION"
+                        <TextBlock x:Name="LblGestion" Text="GESTION"
                                    FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
                                    Foreground="#A6E3A1" Margin="20,20,0,4"/>
 
@@ -162,7 +385,7 @@
                                 Style="{StaticResource ActionButton}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x25B8;" Foreground="#A6E3A1" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="Export Hardware (CSV)"/>
+                                <TextBlock Text="Export Hardware (Excel)"/>
                             </StackPanel>
                         </Button>
 
@@ -171,6 +394,56 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="&#x25B8;" Foreground="#A6E3A1" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="Grouper par Modele"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnAlarms"
+                                Style="{StaticResource ActionButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x25B8;" Foreground="#A6E3A1" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Creer des alarmes"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Categorie : Monitoring -->
+                        <TextBlock x:Name="LblMonitoring" Text="MONITORING"
+                                   FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#89DCEB" Margin="20,20,0,4"/>
+
+                        <Button x:Name="BtnCameraStatus"
+                                Style="{StaticResource ActionButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x25B8;" Foreground="#89DCEB" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Etat des cameras"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnPlaybackReport"
+                                Style="{StaticResource ActionButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x25B8;" Foreground="#89DCEB" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Dates d'enregistrement"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Categorie : Diagnostic -->
+                        <TextBlock x:Name="LblDiagnostic" Text="DIAGNOSTIC"
+                                   FontFamily="Segoe UI" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="#FAB387" Margin="20,20,0,4"/>
+
+                        <Button x:Name="BtnRecordingStats"
+                                Style="{StaticResource ActionButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x25B8;" Foreground="#FAB387" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Stats Enregistrement (7j)"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="BtnLicenseInfo"
+                                Style="{StaticResource ActionButton}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#x25B8;" Foreground="#FAB387" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Informations Licence"/>
                             </StackPanel>
                         </Button>
 
@@ -195,26 +468,29 @@
                             DockPanel.Dock="Right"
                             Content="Effacer"
                             Style="{StaticResource ClearButton}"/>
-                    <TextBlock Text="Journal d'activite"
+                    <Button x:Name="BtnCancel"
+                            DockPanel.Dock="Right"
+                            Content="Annuler"
+                            Style="{StaticResource CancelButton}"
+                            Visibility="Collapsed"
+                            Margin="0,0,8,0"/>
+                    <TextBlock x:Name="LblJournal" Text="Journal d'activite"
                                FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold"
                                Foreground="#CDD6F4" VerticalAlignment="Center"/>
                 </DockPanel>
             </Border>
 
-            <!-- Zone de log -->
+            <!-- Zone de log (RichTextBox pour couleurs) -->
             <Border Grid.Row="1" Margin="20,0,20,12" CornerRadius="8" Background="#11111B">
-                <TextBox x:Name="LogOutput"
-                         IsReadOnly="True"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto"
-                         Background="Transparent"
-                         Foreground="#CDD6F4"
-                         CaretBrush="Transparent"
-                         FontFamily="Cascadia Code,Consolas,Courier New"
-                         FontSize="12"
-                         Padding="16"
-                         BorderThickness="0"
-                         AcceptsReturn="True"/>
+                <RichTextBox x:Name="LogOutput"
+                             IsReadOnly="True"
+                             Background="Transparent"
+                             Foreground="#CDD6F4"
+                             CaretBrush="Transparent"
+                             FontFamily="Cascadia Code,Consolas,Courier New"
+                             FontSize="12"
+                             BorderThickness="0"
+                             VerticalScrollBarVisibility="Auto"/>
             </Border>
 
             <!-- Barre de statut -->
@@ -232,7 +508,8 @@
 
                     <ProgressBar x:Name="ProgressBar"
                                  Grid.Column="1"
-                                 Width="200" Height="3"
+                                 Width="200" Height="4"
+                                 Minimum="0" Maximum="100" Value="0"
                                  IsIndeterminate="False"
                                  Background="#313244"
                                  Foreground="#89B4FA"

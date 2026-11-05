@@ -1,7 +1,12 @@
-{
-    "installMode": "Auto",
-    "outputDirectory": "./Output",
-    "snapshotQuality": 95,
-    "csvDelimiter": ";",
-    "csvEncoding": "UTF8"
+﻿{
+    "outputDirectory":  "./Output",
+    "snapshotQuality":  95,
+    "csvDelimiter":  ";",
+    "csvEncoding":  "UTF8",
+    "autoLogin":  false,
+    "autoUpdate":  {
+                       "enabled":  true,
+                       "repo":  "Nothinx-44/XProtect-Export-Tool-to-Excel-MilestonePSTools-GUI-"
+                   },
+    "language":  "fr"
 }

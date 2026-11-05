@@ -1,43 +1,42 @@
-<#
-.SYNOPSIS
-    Capture un snapshot d'une camera selectionnee via le dialogue Milestone.
-.PARAMETER Config
-    Hashtable de configuration (outputDirectory, snapshotQuality).
-.PARAMETER Log
-    Scriptblock callback pour logger vers l'UI. Usage : & $Log "message"
-#>
-
 function Get-SnapshotSelected {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
-        [hashtable]$Config,
-
-        [Parameter(Mandatory)]
-        [scriptblock]$Log
+        [Parameter(Mandatory)] [hashtable]$Config,
+        [Parameter(Mandatory)] [scriptblock]$Log,
+        [Parameter()] [scriptblock]$Cancel = { $false },
+        [Parameter()] [nullable[datetime]]$SnapshotTime = $null
     )
 
-    & $Log "Ouverture du selecteur de camera..."
+    & $Log $script:T.SS_LogOpening
 
     $camera = Select-Camera
     if (-not $camera) {
-        & $Log "Aucune camera selectionnee. Operation annulee."
+        & $Log $script:T.SS_LogNone
         return
     }
+
+    if (& $Cancel) { return }
 
     $snapshotDir = Join-Path $Config.outputDirectory 'Snapshots'
     if (-not (Test-Path $snapshotDir)) {
         New-Item -Path $snapshotDir -ItemType Directory -Force | Out-Null
     }
 
-    & $Log "Capture du snapshot de '$($camera.Name)'..."
+    if ($SnapshotTime) { & $Log ($script:T.SS_LogHistorique -f $SnapshotTime.ToString('dd/MM/yyyy HH:mm')) }
+    & $Log ($script:T.SS_LogCapturing -f $camera.Name)
 
-    $camera | Get-Snapshot `
-        -UseFriendlyName `
-        -Behavior GetEnd `
-        -Quality $Config.snapshotQuality `
-        -Save `
-        -Path $snapshotDir
-
-    & $Log "Snapshot enregistre dans : $snapshotDir"
+    try {
+        if ($SnapshotTime) {
+            $camera | Get-Snapshot -UseFriendlyName -Behavior GetNearest `
+                -Time $SnapshotTime -Quality $Config.snapshotQuality -Save -Path $snapshotDir
+        }
+        else {
+            $camera | Get-Snapshot -UseFriendlyName -Behavior GetEnd `
+                -Quality $Config.snapshotQuality -Save -Path $snapshotDir
+        }
+        & $Log ($script:T.SS_LogSaved -f $snapshotDir)
+    }
+    catch {
+        & $Log ($script:T.SS_LogError -f $camera.Name, $_)
+    }
 }

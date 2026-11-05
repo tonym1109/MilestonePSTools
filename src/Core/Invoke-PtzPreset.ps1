@@ -25,12 +25,13 @@ function Invoke-PtzPreset {
 
     process {
         # Extraire l'ID camera depuis le chemin du preset
+        # throw (et non Write-Error) : la console est masquee, seule une erreur
+        # terminante remonte au catch de l'appelant et devient visible dans le journal.
         $cameraId = if ($PtzPreset.ParentItemPath -match 'Camera\[(.{36})\]') {
             $Matches[1]
         }
         else {
-            Write-Error "Impossible de parser l'ID camera depuis ParentItemPath '$($PtzPreset.ParentItemPath)'"
-            return
+            throw "Impossible de parser l'ID camera depuis ParentItemPath '$($PtzPreset.ParentItemPath)'"
         }
 
         $camera     = Get-Camera -Id $cameraId
@@ -69,13 +70,22 @@ function Invoke-PtzPreset {
             $position = Send-MipMessage -MessageId Control.PTZGetAbsoluteRequest `
                 -DestinationEndpoint $cameraItem.FQID -UseEnvironmentManager
 
-            $xDiff = [Math]::Abs([Math]::Abs($position.Pan)  - [Math]::Abs($PtzPreset.Pan))
-            $yDiff = [Math]::Abs([Math]::Abs($position.Tilt) - [Math]::Abs($PtzPreset.Tilt))
-            $zDiff = [Math]::Abs([Math]::Abs($position.Zoom) - [Math]::Abs($PtzPreset.Zoom))
+            # Ecart signe : Abs(pos - preset). L'ancienne forme Abs(Abs(a)-Abs(b))
+            # jugeait -0.5 et +0.5 identiques => fausse position "atteinte".
+            $xDiff = [Math]::Abs($position.Pan  - $PtzPreset.Pan)
+            $yDiff = [Math]::Abs($position.Tilt - $PtzPreset.Tilt)
+            $zDiff = [Math]::Abs($position.Zoom - $PtzPreset.Zoom)
 
             if ($xDiff -le $Tolerance -and $yDiff -le $Tolerance -and $zDiff -le $Tolerance) {
                 $positionReached = $true
-                Start-Sleep -Milliseconds 2500
+                # Attente de stabilisation sans bloquer le thread UI
+                $dispatcher = [System.Windows.Threading.Dispatcher]::CurrentDispatcher
+                $deadline   = [DateTime]::UtcNow.AddMilliseconds(2500)
+                while ([DateTime]::UtcNow -lt $deadline) {
+                    $dispatcher.Invoke(
+                        [System.Windows.Threading.DispatcherPriority]::Background, [Action]{})
+                    Start-Sleep -Milliseconds 50
+                }
                 break
             }
 
@@ -83,7 +93,7 @@ function Invoke-PtzPreset {
         }
 
         if (-not $positionReached) {
-            Write-Error "La camera n'a pas atteint la position du preset dans le delai imparti ($Timeout s)."
+            throw "La camera n'a pas atteint la position du preset dans le delai imparti ($Timeout s)."
         }
     }
 }

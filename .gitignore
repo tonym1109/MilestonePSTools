@@ -6,3 +6,6 @@ Output/
 
 # Logs d'activite
 Logs/*.log
+
+# Temoin de deblocage (Unblock-File) genere au premier lancement
+.unblocked

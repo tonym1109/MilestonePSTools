@@ -26,9 +26,9 @@ if (-not (Test-Path $depPath)) {
     New-Item -Path $depPath -ItemType Directory -Force | Out-Null
 }
 
-$modules = @(
-    'MilestonePSTools'
-)
+# Liste des modules : source unique partagee (src/Core/RequiredModules.ps1)
+. (Join-Path $PSScriptRoot 'src/Core/RequiredModules.ps1')
+$modules = (Get-RequiredModules).Name
 
 Write-Host '============================================' -ForegroundColor Cyan
 Write-Host '  Telechargement des dependances offline'     -ForegroundColor Cyan
